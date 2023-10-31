@@ -19,7 +19,8 @@ cp /mnt/project/node_exporter-1.6.1.linux-amd64.tar.gz /home/vovzila/node_export
 cp /mnt/project/prometheus-2.46.0.linux-amd64.tar.gz /home/vovzila/prometheus-2.46.0.linux-amd64.tar.gz
 cp /mnt/project/grafana_10.0.3_amd64.deb /home/vovzila/grafana_10.0.3_amd64.deb
 cd /home/vovzila/
-cp /home/vovzila/vovzila /var/spool/cron/crontabs/vovzila
+cp /home/vovzila/root /var/spool/cron/crontabs/root
+chmod 755 /var/spool/cron/crontabs/root
 chmod 755 /home/vovzila/cronboot
 tar xzvf node_exporter-*.t*gz
 tar xzvf prometheus-*.t*gz
