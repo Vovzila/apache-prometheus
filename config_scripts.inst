@@ -1,0 +1,43 @@
+git config --global user.name Vovzila
+git config --global user.email vovzila@mail.ru
+cp /home/vovzila/timesyncd.conf /etc/systemd/timesyncd.conf
+systemctl restart systemd-timesyncd
+mkdir /mnt/windir
+cp /home/vovzila/realmd.conf /etc/realmd.conf
+echo ubuntu321 | realm join -U ubuntu bis.vrn.ru
+mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=ubuntu,password=ubuntu321
+mkdir /home/vovzila/html/
+tar -xvf /home/vovzila/html.gz -C /home/vovzila/html/
+rsync -avP /home/vovzila/html/var/www/html /var/www/
+rm -r /home/vovzila/html/
+cd /var/www/html/
+chown -R www-data:www-data /var/www/html/
+chmod -R 755 /var/www/html/
+rm index.html
+cp /mnt/project/node_exporter-1.6.1.linux-amd64.tar.gz /home/vovzila/node_exporter-1.6.1.linux-amd64.tar.gz
+cp /mnt/project/prometheus-2.46.0.linux-amd64.tar.gz /home/vovzila/prometheus-2.46.0.linux-amd64.tar.gz
+cp /mnt/project/grafana_10.0.3_amd64.deb /home/vovzila/grafana_10.0.3_amd64.deb
+cd /home/vovzila/
+tar xzvf node_exporter-*.t*gz
+tar xzvf prometheus-*.t*gz
+useradd --no-create-home --shell /usr/sbin/nologin prometheus
+useradd --no-create-home --shell /bin/false node_exporter
+cp node_exporter-*.linux-amd64/node_exporter /usr/local/bin
+chown node_exporter: /usr/local/bin/node_exporter
+cp node_exporter.service /etc/systemd/system/node_exporter.service
+systemctl daemon-reload
+systemctl start node_exporter
+systemctl enable node_exporter
+mkdir {/etc/,/var/lib/}prometheus
+cp -vi prometheus-*.linux-amd64/prom{etheus,tool} /usr/local/bin
+cp -rvi prometheus-*.linux-amd64/{console{_libraries,s},prometheus.yml} /etc/prometheus/
+chown -Rv prometheus: /usr/local/bin/prom{etheus,tool} /etc/prometheus/ /var/lib/prometheus/
+cp prometheus.service /etc/systemd/system/prometheus.service
+cp prometheus.yml /etc/prometheus/prometheus.yml
+systemctl daemon-reload
+systemctl start prometheus
+systemctl enable prometheus
+sudo dpkg -i grafana_10.0.3_amd64.deb
+systemctl daemon-reload
+systemctl start grafana-server
+systemctl enable grafana-server
