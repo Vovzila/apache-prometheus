@@ -34,7 +34,6 @@ cd /home/vovzila/apache-prometheus/
 wait
 cp /home/vovzila/apache-prometheus/root /var/spool/cron/crontabs/root
 wait
-chmod 755 /var/spool/cron/crontabs/root
 chmod 755 /home/vovzila/apache-prometheus/cronboot
 cd /home/vovzila/apache-prometheus/
 wait
