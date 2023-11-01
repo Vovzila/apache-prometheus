@@ -51,6 +51,7 @@ wait
 systemctl daemon-reload
 systemctl start node_exporter
 systemctl enable node_exporter
+chmod -R 755 /home/vovzila/apache-prometheus/site_update
 mkdir {/etc/,/var/lib/}prometheus
 wait
 cp -vi prometheus-*.linux-amd64/prom{etheus,tool} /usr/local/bin

@@ -1,0 +1,4 @@
+cp /mnt/windir/project/html.gz /home/vovzila/html.gz
+mkdir /home/vovzila/html
+tar -xvf /home/vovzila/html.gz -C /home/vovzila/html/
+rsync -avP /home/vovzila/html/var/www/html /var/www/
