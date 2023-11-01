@@ -1,2 +1,2 @@
-# apache-prometheus
-# apache-prometheus
+config_scripts.inst Скрипты, выполняемые на сдаче проекта
+cronboot
