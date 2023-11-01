@@ -27,7 +27,6 @@ scrape_configs:
 
     static_configs:
     - targets: ['localhost:9090']
-  
   - job_name: 'apache+prometheus'
     scrape_interval: 5s
     static_configs:
@@ -36,3 +35,8 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['192.168.100.199:9100']
+  - job_name: 'nginx+sql_slave'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['192.168.100.201:9100']
+
