@@ -81,3 +81,11 @@ rm node_exporter-1.6.1.linux-amd64.tar.gz
 rm prometheus-2.46.0.linux-amd64.tar.gz
 rm -r node_exporter-1.6.1.linux-amd64
 rm -r prometheus-2.46.0.linux-amd64
+#установка пакета filebeat
+dpkg -i /mnt/windir/project/filebeat-8.9.1-amd64.deb
+#конфиг filebeat
+cp /home/vovzila/apache-prometheus/filebeat.yml /etc/filebeat/filebeat.yml
+#filebeat в автозагрузку
+systemctl enable filebeat
+#filebeat перезапуск демона
+systemctl restart filebeat
