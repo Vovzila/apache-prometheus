@@ -1,80 +1,133 @@
+#Настройка переменной имя для Git
 git config --global user.name Vovzila
+#Настройка переменной Email для Git
 git config --global user.email vovzila@mail.ru
+#Клонирование необходимых для восстановления файло из репозитория GitHub
 git clone https://vovzila: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@github.com/Vovzila/apache-prometheus.git
 wait
+#копирование конфигов NTP
 cp /home/vovzila/apache-prometheus/timesyncd.conf /etc/systemd/timesyncd.conf
 wait
+#перезапуск службы синхронизации времени (необходима для корректного подклбчения к домену, т.к. в роли ntp выступает контроллер AD)
 systemctl restart systemd-timesyncd
+#Создание директории, в которую будет подключаться общий ресурс из существующей инфрастуктуры с авторизацией через AD
 mkdir /mnt/windir
 wait
+#Конфиговский файл с описанием окружения при подключении к домену
 cp /home/vovzila/apache-prometheus/realmd.conf /etc/realmd.conf
+#Ввод в домен
 echo ubuntu321 | realm join -U ubuntu bis.vrn.ru
+#Таймаут в 10 секунд для успешной отработки контроллера домена
 sleep 10
+#Подключение к общему ресурсу
 mount.cifs //192.168.100.3/"Общая шара" /mnt/windir -o username=ubuntu,password=ubuntu321
+#Таймаут в 10 секунд для успешной отработки подключения к общему ресурсу
 sleep 10
+#Создание директории, куда будет разархивироваться бэкап сайта
 mkdir /home/vovzila/apache-prometheus/html/
 wait
+#Разархивация бэкапа сайта
 tar -xvf /home/vovzila/apache-prometheus/html.gz -C /home/vovzila/apache-prometheus/html/
 wait
+#синхронизация содержимого /var/www/html/
 rsync -avP /home/vovzila/apache-prometheus/html/var/www/html /var/www/
 wait
+#Удаление временной директории с файлами бэкапа
 rm -r /home/vovzila/apache-prometheus/html/
+#gtht[jl
 cd /var/www/html/
 wait
+#Изменение владельца содержимого дериктории
 chown -R www-data:www-data /var/www/html/
+#Изменение прав содержимого дериктории
 chmod -R 755 /var/www/html/
+#Удаление стокового index файла apache
 rm index.html
+#Копирование дистриба из общей дериктори
 cp /mnt/windir/project/node_exporter-1.6.1.linux-amd64.tar.gz /home/vovzila/apache-prometheus/node_exporter-1.6.1.linux-amd64.tar.gz
 wait
+#Копирование дистриба из общей дериктори
 cp /mnt/windir/project/prometheus-2.46.0.linux-amd64.tar.gz /home/vovzila/apache-prometheus/prometheus-2.46.0.linux-amd64.tar.gz
 wait
+#Копирование дистриба из общей дериктори
 cp /mnt/windir/project/grafana_10.0.3_amd64.deb /home/vovzila/apache-prometheus/grafana_10.0.3_amd64.deb
 wait
+#смена
 cd /home/vovzila/apache-prometheus/
 wait
+#восстановление crontab из бэкапа
 cp /home/vovzila/apache-prometheus/crontab /etc/crontab
 wait
+#изменение прав файла, запускаемого из cron для подключение общего ресурса после перезагрузки
 chmod 755 /home/vovzila/apache-prometheus/cronboot
+#смена расположения
 cd /home/vovzila/apache-prometheus/
 wait
+#разархивация node_exporter
 tar xzvf node_exporter-*.t*gz
 wait
+#разархивация prometheus
 tar xzvf prometheus-*.t*gz
 wait
+#создание пользователя для prometheus
 useradd --no-create-home --shell /usr/sbin/nologin prometheus
+#создание пользователя для node_exporter
 useradd --no-create-home --shell /bin/false node_exporter
+#копирование файлов node_exporter в конечную директорию
 cp node_exporter-*.linux-amd64/node_exporter /usr/local/bin
 wait
+#изменение владельца файлов в директории
 chown node_exporter: /usr/local/bin/node_exporter
+#копирование сервиса node_exporter
 cp node_exporter.service /etc/systemd/system/node_exporter.service
 wait
+#перезапуск службы демонов
 systemctl daemon-reload
+#запуск демона node_exporter
 systemctl start node_exporter
+#node_exporter в автозапуск
 systemctl enable node_exporter
+#изменение прав файла, выполняющего обновление с общего ресурса /var/www/html/
 chmod -R 755 /home/vovzila/apache-prometheus/site_update
+#создание нескольких директорий с одинаковым имененм в разных директориях
 mkdir {/etc/,/var/lib/}prometheus
 wait
+#копирование файлов prometheus из временной директории
 cp -vi prometheus-*.linux-amd64/prom{etheus,tool} /usr/local/bin
 wait
+#копирование файлов prometheus из временной директории
 cp -rvi prometheus-*.linux-amd64/{console{_libraries,s},prometheus.yml} /etc/prometheus/
 wait
+#изменеие владельца
 chown -Rv prometheus: /usr/local/bin/prom{etheus,tool} /etc/prometheus/ /var/lib/prometheus/
+#копирование демона prometheus из временной директории
 cp prometheus.service /etc/systemd/system/prometheus.service
 wait
+#копирование конфига prometheus из бэкапа
 cp prometheus.yml /etc/prometheus/prometheus.yml
+#перезаруск службы демонов
 systemctl daemon-reload
 wait
+#запуск демона prometheus
 systemctl start prometheus
+#prometheus в автозагрузку
 systemctl enable prometheus
 wait
+#установка пакета grafana
 sudo dpkg -i grafana_10.0.3_amd64.deb
 wait
+#копирование БД grafana из бэкапа
 cp /home/vovzila/apache-prometheus/grafana.db /var/lib/grafana/grafana.db
+#перезапуск службы демонов
 systemctl daemon-reload
 wait
+#запуск демона grafana
 systemctl start grafana-server
+#grafana в автозапуск
 systemctl enable grafana-server
+#переход
 cd /home/vovzila/apache-prometheus/
+#удаление временных файлов
 rm grafana_10.0.3_amd64.deb
 rm html.gz
 rm node_exporter-1.6.1.linux-amd64.tar.gz
@@ -83,8 +136,10 @@ rm -r node_exporter-1.6.1.linux-amd64
 rm -r prometheus-2.46.0.linux-amd64
 #установка пакета filebeat
 dpkg -i /mnt/windir/project/filebeat-8.9.1-amd64.deb
+wait
 #конфиг filebeat
 cp /home/vovzila/apache-prometheus/filebeat.yml /etc/filebeat/filebeat.yml
+wait
 #filebeat в автозагрузку
 systemctl enable filebeat
 #filebeat перезапуск демона
