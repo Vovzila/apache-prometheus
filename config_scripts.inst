@@ -118,6 +118,7 @@ sudo dpkg -i grafana_10.0.3_amd64.deb
 wait
 #копирование БД grafana из бэкапа
 cp /home/vovzila/apache-prometheus/grafana.db /var/lib/grafana/grafana.db
+chmod 766 /var/lib/grafana/grafana.db
 #перезапуск службы демонов
 systemctl daemon-reload
 wait
